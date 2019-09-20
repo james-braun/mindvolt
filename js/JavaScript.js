@@ -7,48 +7,35 @@ $('video').mediaelementplayer({
 
 
 // this varible holds the location of the beginning of each highted segment of text.
-var beginTimes = [0.000, 4.130, 7.535, 11.270, 13.960, 17.940, 22.370, 26.880, 30.920, 34.730, 39.430, 41.190, 46.300, 49.270, 53.760, 57.780];
+var times = [0.000, 4.130, 7.535, 11.270, 13.960, 17.940, 22.370, 26.880, 30.920, 34.730, 39.430, 41.190, 46.300, 49.270, 53.760, 57.780, 100.150];
 
-// this varible hold the current
-// index of "beginTimes" that the
-// video is on.
-var i = 0;
+// span offset for spans found in video.
+const spanOffset = 13
 
 // As the video plays highlight portions of th text.
 $('video').on('timeupdate', function () {
 
-    // if the video is past the beginning of the next segment
-    // higlight the next segment.
-    if (this.currentTime > beginTimes[i + 1] && beginTimes.length > i) {
+    // while traversing the spans in the html avoiding the spans in the video...
+    for (let i = 0; i < $('span').length - spanOffset + 1; ++i) {
 
-        // remove the highlight from the current segment.
-        document.querySelector(".current").classList.remove("current");
-
-        // increment the time index.
-        ++i;
-
-        // highlight the new segment of text.
-        document.getElementById("time" + i).classList.add("current");
+        // Where the "currentTime" is on the current sentence change the color 
+        // of the sentence to blue. Else change the rest of the sentences black.
+        if ((this.currentTime >= times[i]) && (this.currentTime < times[i + 1])) {
+            $('span').eq(i + spanOffset).css("color", "blue");
+        } else {
+            $('span').eq(i + spanOffset).css("color", "black");
+        }
     }
 });
 
 // If a portion of the text is clicked start playing
 // the video at that location.
-for (let j = 0; j < $('span').length; ++j) {
+for (let j = spanOffset; j < $('span').length; ++j) {
 
     // for each segment if clicked...
     $('span').eq(j).click(function () {
-
-        // remove current segment color.
-        document.querySelector(".current").classList.remove("current");
-
-        // add new segment color.
-        this.classList.add("current");
-
-        // adjust the time index.
-        i = parseInt(this.id.split('e')[1]);
-
-        // set the video to play at the new time index.
-        $('video')[0].currentTime = beginTimes[i];
+           
+            // set the video to play at the new time index.
+            $('video')[0].currentTime = times[parseInt(this.id.split('e')[1])];
     });
 }
